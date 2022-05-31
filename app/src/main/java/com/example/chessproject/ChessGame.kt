@@ -3,13 +3,13 @@ package com.example.chessproject
 import kotlin.math.abs
 var turn = 0
 var chessArray = mutableSetOf<Piece>()
+lateinit var movingPiece: Piece
+lateinit var lastMove: LastMove
 object ChessGame {
 
     init {
         reset()
     }
-
-    var lastMove = LastMove(Square(0,0), Square(0,0), Player.WHITE, Types.PAWN)
 
     fun clear() {
         chessArray.clear()
@@ -41,7 +41,7 @@ object ChessGame {
     private fun movePiece(fromCol : Int, fromRow: Int, toCol: Int, toRow: Int)
     {
         if(fromRow == toRow && fromCol == toCol) return
-        val movingPiece = pieceAt(fromCol, fromRow) ?: return
+        movingPiece = pieceAt(fromCol, fromRow) ?: return
         val capturedPiece = pieceAt(toCol, toRow)
         if(turn % 2 == 0 && movingPiece.player == Player.BLACK) {
             return
@@ -60,7 +60,8 @@ object ChessGame {
             lastMove.PieceType = movingPiece.types
             lastMove.Player = movingPiece.player
             lastMove.lastMoveStarting = Square(fromCol, fromRow)
-            lastMove.lastMoveStarting = Square(toCol, toRow)
+            lastMove.lastMoveEnding = Square(toCol, toRow)
+
             chessArray.remove(capturedPiece)
             chessArray.remove(movingPiece)
             chessArray.add(Piece(toCol, toRow, movingPiece.player, movingPiece.types, movingPiece.resID))
@@ -70,6 +71,7 @@ object ChessGame {
 
         fun reset() {
             turn = 0
+            lastMove = LastMove(Square(0,0), Square(0,0), Player.WHITE, Types.PAWN)
             chessArray.removeAll(chessArray)
 
             chessArray.add(Piece(3, 0, Player.WHITE, Types.QUEEN, R.drawable.queen_white))
@@ -154,70 +156,6 @@ object ChessGame {
         }
         return null
     }
-
-    /*
-
-    private fun enPassant(from: Square, to: Square) : Boolean {
-        val rightSquare = pieceAt(lastMove.lastMoveEnding.col + 1, lastMove.lastMoveEnding.row)
-        val leftSquare = pieceAt(lastMove.lastMoveEnding.col - 1, lastMove.lastMoveEnding.row)
-        val space = lastMove.lastMoveStarting.row - lastMove.lastMoveEnding.row
-        if (lastMove.PieceType == Types.PAWN){
-            if (abs(space) == 2) {
-                //Black en passant
-                if(lastMove.Player == Player.WHITE) {
-                    if(lastMove.lastMoveEnding.col == 0)
-                    {
-                        if(rightSquare?.types == Types.PAWN && rightSquare.player == Player.BLACK)
-                        {
-                            return true
-                        }
-                    }
-                    else if(lastMove.lastMoveEnding.col == 7)
-                    {
-                        if(leftSquare?.types == Types.PAWN && leftSquare.player == Player.BLACK)
-                        {
-                            return true
-                        }
-                    }
-                    else{
-                        if((leftSquare?.types == Types.PAWN && leftSquare.player == Player.BLACK)
-                            || (rightSquare?.types == Types.PAWN && rightSquare.player == Player.BLACK))
-                        {
-                            return true
-                        }
-                    }
-                }
-                //White en passant
-                if(lastMove.Player == Player.BLACK) {
-                    if(lastMove.lastMoveEnding.col == 0)
-                    {
-                        if(rightSquare?.types == Types.PAWN && rightSquare.player == Player.WHITE)
-                        {
-                            chessArray.remove(pieceAt(to.col, to.row-1))
-                            return true
-                        }
-                    }
-                    else if(lastMove.lastMoveEnding.col == 7)
-                    {
-                        if(leftSquare?.types == Types.PAWN && leftSquare.player == Player.WHITE)
-                        {
-                            chessArray.remove(pieceAt(to.col, to.row-1))
-                            return true
-                        }
-                    }
-                    else{
-                        if((leftSquare?.types == Types.PAWN && leftSquare.player == Player.WHITE)
-                            || (rightSquare?.types == Types.PAWN && rightSquare.player == Player.WHITE))
-                        {
-                            return true
-                        }
-                    }
-                }
-            }
-        }
-        return false
-    } */
-
 }
 
 

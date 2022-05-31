@@ -11,7 +11,7 @@ import kotlin.math.min
 class ChessBoard(context: Context?, attrs: AttributeSet?) : View(context, attrs) {
     private val originX = 20f
     private val originY = 200f
-    private val squareSize: Float = 175f //120f on phone
+    private val squareSize: Float = 175f //130f on phone 175f on mac
     private val black = Color.argb(1f, .4f, .4f, .4f)
     private val white = Color.argb(1f, .8f, .8f, .8f)
     private val bitmaps = mutableMapOf<Int, Bitmap>()

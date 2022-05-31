@@ -1,18 +1,15 @@
 package com.example.chessproject
 
 import kotlin.math.abs
-
+    var hasWhiteKingMoved = false
+    var hasBlackKingMoved = false
+    var hasRookA1Moved = false
+    var hasRookA8Moved = false
+    var hasRookH1Moved = false
+    var hasRookH8Moved = false
     fun canPawnMove(from: Square, to: Square) : Boolean {
-        var rightSquare = ChessGame.pieceAt(
-            ChessGame.lastMove.lastMoveEnding.col + 1,
-            ChessGame.lastMove.lastMoveEnding.row
-        )
-        var leftSquare = ChessGame.pieceAt(
-            ChessGame.lastMove.lastMoveEnding.col - 1,
-            ChessGame.lastMove.lastMoveEnding.row
-        )
         val space = abs(from.row - to.row)
-        var lastMoveSpace = ChessGame.lastMove.lastMoveStarting.row - ChessGame.lastMove.lastMoveEnding.row
+        var lastMoveSpace = abs(lastMove.lastMoveStarting.row - lastMove.lastMoveEnding.row)
         if (ChessGame.pieceAt(from)?.player == Player.WHITE) {
             if(from.col == to.col && Clear.isClearVerticallyPawn(from, to))
             {
@@ -29,37 +26,23 @@ import kotlin.math.abs
                 && ChessGame.pieceAt(to.col, to.row) != null)
             {
                 return true
+            } //en passant
+            else if(lastMoveSpace == 2 && lastMove.PieceType == Types.PAWN && turn % 2 ==0)
+            {
+                if((lastMove.lastMoveEnding.col + 1 == from.col ||
+                            lastMove.lastMoveEnding.col - 1 == from.col) &&
+                        lastMove.lastMoveEnding.row == from.row)
+                {
+                    if(to.col == lastMove.lastMoveEnding.col &&
+                        to.row == lastMove.lastMoveEnding.row + 1)
+                    {
+                        chessArray.remove(ChessGame.pieceAt(to.col, to.row - 1))
+                        return true
+                    }
+                }
             }
-            //en passant
-            /*      else if(lastMove.Player == Player.BLACK && lastMoveSpace == 2 && lastMove.PieceType == Types.PAWN)
-                  {
-                      if(lastMove.lastMoveEnding.col == 0)
-                      {
-                          if(rightSquare?.types == Types.PAWN && rightSquare.player == Player.BLACK)
-                          {
-                              chessArray.remove(pieceAt(to.col, to.row-1))
-                              return true
-                          }
-                      }
-                      else if(lastMove.lastMoveEnding.col == 7)
-                      {
-                          if(leftSquare?.types == Types.PAWN && leftSquare.player == Player.BLACK)
-                          {
-                              chessArray.remove(pieceAt(to.col, to.row-1))
-                              return true
-                          }
-                      }
-                      else{
-                          if((leftSquare?.types == Types.PAWN && leftSquare.player == Player.BLACK)
-                              || (rightSquare?.types == Types.PAWN && rightSquare.player == Player.BLACK))
-                          {
-                              chessArray.remove(pieceAt(to.col, to.row-1))
-                              return true
-                          }
-                      }
-                  }*/
         }
-        else{
+        else {
             if(from.col == to.col && Clear.isClearVerticallyPawn(from, to))
             {
                 if(from.row == 6)
@@ -73,9 +56,22 @@ import kotlin.math.abs
             else if((from.col + 1 == to.col || from.col - 1 == to.col) && from.row - 1 == to.row
                 && ChessGame.pieceAt(to.col, to.row) != null) {
                 return true
+            } //en passant
+            else if(lastMoveSpace == 2 && lastMove.PieceType == Types.PAWN && turn % 2 == 1)
+            {
+                if((lastMove.lastMoveEnding.col + 1 == from.col ||
+                            lastMove.lastMoveEnding.col - 1 == from.col) &&
+                    lastMove.lastMoveEnding.row == from.row)
+                {
+                    if(to.col == lastMove.lastMoveEnding.col &&
+                        to.row == lastMove.lastMoveEnding.row - 1)
+                    {
+                        chessArray.remove(ChessGame.pieceAt(to.col, to.row + 1))
+                        return true
+                    }
+                }
             }
         }
-
         return false
     }
 
@@ -95,6 +91,22 @@ import kotlin.math.abs
         if((from.col == to.col && Clear.isClearVertically(from, to)
             || from.row == to.row && Clear.isClearHorizontally(from, to)))
         {
+            if(from.col == 0 && from.row == 0)
+            {
+                hasRookA1Moved = true
+            }
+            else if(from.col == 0 && from.row == 7)
+            {
+                hasRookA8Moved = true
+            }
+            else if(from.col == 7 && from.row == 0)
+            {
+                hasRookH1Moved = true
+            }
+            else
+            {
+                hasRookH8Moved = true
+            }
             return true
         }
         return false
@@ -115,10 +127,58 @@ import kotlin.math.abs
     }
 
     fun canKingMove(from: Square, to: Square) : Boolean {
+        var gap = abs(from.col - to.col)
+        lateinit var Rook : Piece
         if(abs(from.col - to.col) <= 1 && abs(from.row - to.row) <= 1) {
+            val movingPiece = ChessGame.pieceAt(from)
+            when(movingPiece?.player)
+            {
+                Player.WHITE -> hasWhiteKingMoved = true
+                Player.BLACK -> hasBlackKingMoved = true
+            }
             return true
+        } //Castling
+        else if(gap == 2 && !hasWhiteKingMoved &&
+            Clear.isClearHorizontally(from, to))
+        {
+            if(to.col == 2 && to.row == 0 && !hasRookA1Moved &&
+                ChessGame.pieceAt(from)?.player == Player.WHITE)
+            {
+                hasWhiteKingMoved = true
+                chessArray.remove(ChessGame.pieceAt(0,0))
+                chessArray.add(Piece(3, 0, Player.WHITE, Types.ROOK, R.drawable.rook_white))
+                return true
+            }
+            else if (to.col == 6 && to.row == 0 && !hasRookH1Moved &&
+                ChessGame.pieceAt(from)?.player == Player.WHITE)
+            {
+                hasWhiteKingMoved = true
+                chessArray.remove(ChessGame.pieceAt(7,0))
+                chessArray.add(Piece(5, 0, Player.WHITE, Types.ROOK, R.drawable.rook_white))
+                return true
+            }
         }
-        return false
+        else if(gap == 2 && !hasBlackKingMoved &&
+            Clear.isClearHorizontally(from, to))
+        {
+            if(to.col == 2 && to.row == 7 && !hasRookA8Moved &&
+                ChessGame.pieceAt(from)?.player == Player.BLACK)
+            {
+                hasBlackKingMoved = true
+                chessArray.remove(ChessGame.pieceAt(0,7))
+                chessArray.add(Piece(3, 7, Player.BLACK, Types.ROOK, R.drawable.rook_black))
+                return true
+            }
+            else if (to.col == 6 && to.row == 7 && !hasRookH8Moved &&
+                ChessGame.pieceAt(from)?.player == Player.BLACK)
+            {
+                hasBlackKingMoved = true
+                chessArray.remove(ChessGame.pieceAt(7,7))
+                chessArray.add(Piece(5, 7, Player.BLACK, Types.ROOK, R.drawable.rook_black))
+                return true
+            }
+        }
+     return false
     }
 
 
