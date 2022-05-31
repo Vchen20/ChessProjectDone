@@ -1,11 +1,9 @@
 package com.example.chessproject
 
 import kotlin.math.abs
-
+var turn = 0
+var chessArray = mutableSetOf<Piece>()
 object ChessGame {
-
-    private var chessArray = mutableSetOf<Piece>()
-    var turn = 0
 
     init {
         reset()
@@ -156,11 +154,6 @@ object ChessGame {
         }
         return null
     }
-
-    fun inCheck() : Boolean {
-        return false
-    }
-
 
     /*
 

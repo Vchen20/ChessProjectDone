@@ -30,9 +30,9 @@ object Clear {
 
     fun isClearHorizontally(from: Square, to: Square): Boolean{
         if(from.row != to.row) return false
-        val space = abs(from.col - to.col) - 1
-        if(space == 0) return true
-        for (i in 1..space)
+        val gap = abs(from.col - to.col) - 1
+        if(gap == 0) return true
+        for (i in 1..gap)
         {
             val nextCol = if (to.col > from.col) from.col + i else from.col - i
             if (ChessGame.pieceAt(Square(nextCol, from.row)) != null) {

@@ -92,8 +92,8 @@ import kotlin.math.abs
     }
 
     fun canRookMove(from: Square, to: Square): Boolean {
-        if(from.col == to.col && Clear.isClearVertically(from, to)
-            || from.row == to.row && Clear.isClearHorizontally(from, to))
+        if((from.col == to.col && Clear.isClearVertically(from, to)
+            || from.row == to.row && Clear.isClearHorizontally(from, to)))
         {
             return true
         }
@@ -101,14 +101,14 @@ import kotlin.math.abs
     }
 
     fun canBishopMove(from: Square, to: Square): Boolean {
-        if (abs(from.col - to.col) == abs(from.row - to.row)) {
+        if ((abs(from.col - to.col) == abs(from.row - to.row))) {
             return Clear.isClearDiagonally(from, to)
         }
         return false
     }
 
     fun canQueenMove(from: Square, to: Square) : Boolean {
-        if(canBishopMove(from, to) || canRookMove(from, to)){
+        if((canBishopMove(from, to) || canRookMove(from, to))){
             return true
         }
         return false
@@ -120,3 +120,5 @@ import kotlin.math.abs
         }
         return false
     }
+
+
